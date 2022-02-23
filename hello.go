@@ -14,9 +14,16 @@ func main() {
 	fmt.Println("0. Sair do Programa")
 
 	var command int
-	
-	// fmt.Scanf("%d", &command)
 
 	fmt.Scan(&command)
-	fmt.Println(command)
+
+	if command == 1 {
+		fmt.Println("Yay!")
+	} else if command == 2 {
+		fmt.Println("Wow!")
+	} else if command == 0 {
+		fmt.Println("Dying! :)")
+	} else {
+		fmt.Println("Sorry, I'm a robot and I don't know this expression :(")
+	}
 }
