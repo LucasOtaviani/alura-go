@@ -17,13 +17,14 @@ func main() {
 
 	fmt.Scan(&command)
 
-	if command == 1 {
+	switch command {
+	case 1:
 		fmt.Println("Yay!")
-	} else if command == 2 {
+	case 2:
 		fmt.Println("Wow!")
-	} else if command == 0 {
+	case 0:
 		fmt.Println("Dying! :)")
-	} else {
+	default:
 		fmt.Println("Sorry, I'm a robot and I don't know this expression :(")
 	}
 }
