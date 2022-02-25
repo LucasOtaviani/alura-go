@@ -2,24 +2,28 @@ package main
 
 import "fmt"
 import "os"
+import "net/http"
 
 func main() {
 	showIntroduction()
-	showMenu()
 
-	command := readCommand()
-
-	switch command {
-	case 1:
-		fmt.Println("Yay!")
-	case 2:
-		fmt.Println("Wow!")
-	case 0:
-		fmt.Println("Dying! :)")
-		os.Exit(0)
-	default:
-		fmt.Println("Sorry, I'm a robot and I don't know this expression :(")
-		os.Exit(-1)
+	for {
+		showMenu()
+	
+		command := readCommand()
+	
+		switch command {
+		case 1:
+			startMonitoring()
+		case 2:
+			// getLogs()
+		case 0:
+			fmt.Println("Dying! :)")
+			os.Exit(0)
+		default:
+			fmt.Println("Sorry, I'm a robot and I don't know this expression :(")
+			os.Exit(-1)
+		}
 	}
 }
 
@@ -42,4 +46,15 @@ func readCommand() int {
 	fmt.Scan(&command)
 
 	return command
+}
+
+func startMonitoring() {
+	site := "https://www.alura.com.br"
+	response, _ := http.Get(site)
+
+	if (response.StatusCode == 200) {
+		fmt.Println("Website:", site, "was loaded successfully")
+	} else {
+		fmt.Println("Something went wrong. Status code:", response.StatusCode)
+	}
 }
