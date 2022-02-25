@@ -1,22 +1,31 @@
 package main
 
-import "fmt"
-import "os"
-import "net/http"
+import (
+	"bufio"
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"strings"
+	"time"
+)
+
+const monitorings = 3
+const delay = 5
 
 func main() {
 	showIntroduction()
 
 	for {
 		showMenu()
-	
+
 		command := readCommand()
-	
+
 		switch command {
 		case 1:
 			startMonitoring()
 		case 2:
-			// getLogs()
+			getLogs()
 		case 0:
 			fmt.Println("Dying! :)")
 			os.Exit(0)
@@ -49,12 +58,60 @@ func readCommand() int {
 }
 
 func startMonitoring() {
-	site := "https://www.alura.com.br"
-	response, _ := http.Get(site)
+	websites := readWebsiteFile()
 
-	if (response.StatusCode == 200) {
-		fmt.Println("Website:", site, "was loaded successfully")
+	for i := 0; i < monitorings; i++ {
+		for _, website := range websites {
+			testSite(website)
+		}
+
+		time.Sleep(delay * time.Second)
+		fmt.Println("")
+	}
+}
+
+func getLogs() {
+
+}
+
+func testSite(website string) {
+	response, error := http.Get(website)
+
+	if error != nil {
+		fmt.Println(error)
+		return
+	}
+
+	if response.StatusCode == 200 {
+		fmt.Println("Website:", website, "was loaded successfully")
 	} else {
 		fmt.Println("Something went wrong. Status code:", response.StatusCode)
 	}
+}
+
+func readWebsiteFile() []string {
+	var sites []string
+
+	file, error := os.Open("websites.txt")
+
+	if error != nil {
+		fmt.Println(error)
+	}
+
+	reader := bufio.NewReader(file)
+
+	for {
+		line, error := reader.ReadString('\n')
+		line = strings.TrimSpace(line)
+
+		sites = append(sites, line)
+
+		if error == io.EOF {
+			break
+		}
+	}
+
+	file.Close()
+
+	return sites
 }
