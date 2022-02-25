@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
@@ -11,7 +12,7 @@ import (
 )
 
 const monitorings = 3
-const delay = 5
+const delay = 3
 
 func main() {
 	showIntroduction()
@@ -25,7 +26,7 @@ func main() {
 		case 1:
 			startMonitoring()
 		case 2:
-			getLogs()
+			readLogs()
 		case 0:
 			fmt.Println("Dying! :)")
 			os.Exit(0)
@@ -70,10 +71,6 @@ func startMonitoring() {
 	}
 }
 
-func getLogs() {
-
-}
-
 func testSite(website string) {
 	response, error := http.Get(website)
 
@@ -84,8 +81,10 @@ func testSite(website string) {
 
 	if response.StatusCode == 200 {
 		fmt.Println("Website:", website, "was loaded successfully")
+		registerLog(website, true)
 	} else {
 		fmt.Println("Something went wrong. Status code:", response.StatusCode)
+		registerLog(website, false)
 	}
 }
 
@@ -114,4 +113,31 @@ func readWebsiteFile() []string {
 	file.Close()
 
 	return sites
+}
+
+func registerLog(website string, status bool) {
+	file, error := os.OpenFile("log.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+
+	if error != nil {
+		fmt.Println(error)
+	}
+
+	isOnline := "ONLINE"
+
+	if !status {
+		isOnline = "OFFLINE"
+	}
+
+	file.WriteString(time.Now().Format("02/01/2006 15:04:05") + " " + isOnline + " " + website + "\n")
+	file.Close()
+}
+
+func readLogs() {
+	file, error := ioutil.ReadFile("log.txt")
+
+	if error != nil {
+		fmt.Println(error)
+	}
+
+	fmt.Println(string(file))
 }
